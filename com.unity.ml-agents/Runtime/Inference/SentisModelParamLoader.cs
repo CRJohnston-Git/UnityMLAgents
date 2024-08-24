@@ -809,7 +809,7 @@ namespace Unity.MLAgents.Inference
         /// check failed. If the check passed, returns null.
         /// </returns>
         static FailedCheck CheckDiscreteActionOutputShape(
-            BrainParameters brainParameters, ActuatorComponent[] actuatorComponents, TensorFloat modelDiscreteBranches)
+            BrainParameters brainParameters, ActuatorComponent[] actuatorComponents, Tensor<float> modelDiscreteBranches)
         {
             var discreteActionBranches = brainParameters.ActionSpec.BranchSizes.ToList();
             foreach (var actuatorComponent in actuatorComponents)

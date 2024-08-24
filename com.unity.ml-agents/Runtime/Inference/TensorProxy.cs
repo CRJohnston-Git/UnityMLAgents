@@ -43,7 +43,7 @@ namespace Unity.MLAgents.Inference
         // Since Type is not serializable, we use the DisplayType for the Inspector
         public Type DataType => k_TypeMap[valueType];
         public DataType DType => k_DTypeMap[valueType];
-        public long[] shape;
+        public int[] shape;
         public Tensor data;
         public BackendType Device => data.dataOnBackend.backendType;
 
@@ -103,29 +103,29 @@ namespace Unity.MLAgents.Inference
             switch (dataType)
             {
                 case DataType.Float:
-                    tensor = TensorFloat.AllocZeros(shape);
+                    tensor = new Tensor<float>(shape);
                     break;
                 case DataType.Int:
-                    tensor = TensorInt.AllocZeros(shape);
+                    tensor = new Tensor<int>(shape);
                     break;
             }
 
             return tensor;
         }
 
-        internal static long[] TensorShapeFromSentis(TensorShape src)
+        internal static int[] TensorShapeFromSentis(TensorShape src)
         {
             if (src.rank == 2)
             {
-                return new long[] { src.Batch(), src.Channels() };
+                return new int[] { src.Batch(), src.Channels() };
             }
 
             if (src.Height() == 1 && src.Width() == 1)
             {
-                return new long[] { src.Batch(), src.Channels() };
+                return new int[] { src.Batch(), src.Channels() };
             }
 
-            return new long[] { src.Batch(), src.Channels(), src.Height(), src.Width() };
+            return new int[] { src.Batch(), src.Channels(), src.Height(), src.Width() };
         }
 
         public static TensorProxy TensorProxyFromSentis(Tensor src, string nameOverride = null)
@@ -155,10 +155,7 @@ namespace Unity.MLAgents.Inference
             var width = tensorProxy.data.Width();
             var channels = tensorProxy.data.Channels();
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
+            tensorProxy.data.CompleteAllPendingOperations();
 
             for (var h = 0; h < height; h++)
             {
@@ -166,7 +163,7 @@ namespace Unity.MLAgents.Inference
                 {
                     for (var c = 0; c < channels; c++)
                     {
-                        ((TensorFloat)tensorProxy.data)[batch, c, h, w] = fillValue;
+                        ((Tensor<float>)tensorProxy.data)[batch, c, h, w] = fillValue;
                     }
                 }
             }
@@ -196,14 +193,11 @@ namespace Unity.MLAgents.Inference
                 throw new ArgumentNullException();
             }
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
+            tensorProxy.data.CompleteAllPendingOperations();
 
             for (var i = 0; i < tensorProxy.data.Length(); i++)
             {
-                ((TensorFloat)tensorProxy.data)[i] = (float)randomNormal.NextDouble();
+                ((Tensor<float>)tensorProxy.data)[i] = (float)randomNormal.NextDouble();
             }
         }
     }

@@ -35,13 +35,9 @@ namespace Unity.MLAgents.Inference
             tensorProxy.data?.Dispose();
             var newTensorShape = new TensorShape(1, 1);
             tensorProxy.data = TensorUtils.CreateEmptyTensor(newTensorShape, tensorProxy.DType);
+            tensorProxy.data.CompleteAllPendingOperations();
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
-
-            ((TensorInt)tensorProxy.data)[0] = batchSize;
+            ((Tensor<int>)tensorProxy.data)[0] = batchSize;
         }
     }
 
@@ -57,17 +53,13 @@ namespace Unity.MLAgents.Inference
 
         public void Generate(TensorProxy tensorProxy, int batchSize, IList<AgentInfoSensorsPair> infos)
         {
-            tensorProxy.shape = new long[0];
+            tensorProxy.shape = Array.Empty<int>();
             tensorProxy.data?.Dispose();
             var newTensorShape = new TensorShape(1, 1);
             tensorProxy.data = TensorUtils.CreateEmptyTensor(newTensorShape, tensorProxy.DType);
+            tensorProxy.data.CompleteAllPendingOperations();
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
-
-            ((TensorInt)tensorProxy.data)[0] = 1;
+            ((Tensor<int>)tensorProxy.data)[0] = 1;
         }
     }
 
@@ -94,12 +86,10 @@ namespace Unity.MLAgents.Inference
 
             var memorySize = tensorProxy.data.Width();
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
+            tensorProxy.data.CompleteAllPendingOperations();
 
             var agentIndex = 0;
+
             for (var infoIndex = 0; infoIndex < infos.Count; infoIndex++)
             {
                 var infoSensorPair = infos[infoIndex];
@@ -116,7 +106,7 @@ namespace Unity.MLAgents.Inference
 
                     for (var j = 0; j < memorySize; j++)
                     {
-                        ((TensorFloat)tensorProxy.data)[agentIndex, 0, j] = 0;
+                        ((Tensor<float>)tensorProxy.data)[agentIndex, 0, j] = 0;
                     }
 
                     agentIndex++;
@@ -130,7 +120,7 @@ namespace Unity.MLAgents.Inference
                         break;
                     }
 
-                    ((TensorFloat)tensorProxy.data)[agentIndex, 0, j] = memory[j];
+                    ((Tensor<float>)tensorProxy.data)[agentIndex, 0, j] = memory[j];
                 }
 
                 agentIndex++;
@@ -151,11 +141,7 @@ namespace Unity.MLAgents.Inference
         public void Generate(TensorProxy tensorProxy, int batchSize, IList<AgentInfoSensorsPair> infos)
         {
             TensorUtils.ResizeTensor(tensorProxy, batchSize);
-
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
+            tensorProxy.data.CompleteAllPendingOperations();
 
             var actionSize = tensorProxy.shape[tensorProxy.shape.Length - 1];
             var agentIndex = 0;
@@ -168,7 +154,7 @@ namespace Unity.MLAgents.Inference
                 {
                     for (var j = 0; j < actionSize; j++)
                     {
-                        ((TensorInt)tensorProxy.data)[agentIndex, j] = pastAction[j];
+                        ((Tensor<int>)tensorProxy.data)[agentIndex, j] = pastAction[j];
                     }
                 }
 
@@ -191,10 +177,7 @@ namespace Unity.MLAgents.Inference
         {
             TensorUtils.ResizeTensor(tensorProxy, batchSize);
 
-            if (tensorProxy.data.dataOnBackend.backendType != BackendType.CPU)
-            {
-                tensorProxy.data.CompleteOperationsAndDownload();
-            }
+            tensorProxy.data.CompleteAllPendingOperations();
 
             var maskSize = tensorProxy.shape[tensorProxy.shape.Length - 1];
             var agentIndex = 0;
@@ -207,7 +190,7 @@ namespace Unity.MLAgents.Inference
                 for (var j = 0; j < maskSize; j++)
                 {
                     var isUnmasked = (maskList != null && maskList[j]) ? 0.0f : 1.0f;
-                    ((TensorFloat)tensorProxy.data)[agentIndex, j] = isUnmasked;
+                    ((Tensor<float>)tensorProxy.data)[agentIndex, j] = isUnmasked;
                 }
 
                 agentIndex++;

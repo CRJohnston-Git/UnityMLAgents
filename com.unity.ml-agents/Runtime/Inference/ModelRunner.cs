@@ -25,7 +25,7 @@ namespace Unity.MLAgents.Inference
         ModelAsset m_Model;
         string m_ModelName;
         InferenceDevice m_InferenceDevice;
-        IWorker m_Engine;
+        Worker m_Engine;
         bool m_DeterministicInference;
         string[] m_OutputNames;
         IReadOnlyList<TensorProxy> m_InferenceInputs;
@@ -105,7 +105,7 @@ namespace Unity.MLAgents.Inference
                         executionDevice = BackendType.CPU;
                         break;
                 }
-                m_Engine = WorkerFactory.CreateWorker(executionDevice, sentisModel);
+                m_Engine = new Worker(sentisModel, executionDevice);
             }
             else
             {
@@ -226,7 +226,11 @@ namespace Unity.MLAgents.Inference
 
             // Execute the Model
             Profiler.BeginSample($"ExecuteGraph");
-            m_Engine.Execute(m_InputsByName);
+            foreach (var kv in m_InputsByName)
+            {
+                m_Engine.SetInput(kv.Key, kv.Value);
+            }
+            m_Engine.Schedule();
             Profiler.EndSample();
 
             Profiler.BeginSample($"FetchSentisOutputs");

@@ -18,7 +18,7 @@ namespace Unity.MLAgents.Tests
 
             // Set shape to {1, ..., channels, height, width}
             // For 8D, the ... are all 1's
-            var shape = new long[dimension];
+            var shape = new int[dimension];
             for (var i = 0; i < dimension; i++)
             {
                 shape[i] = 1;
@@ -36,7 +36,7 @@ namespace Unity.MLAgents.Tests
             var tensorProxy = new TensorProxy
             {
                 valueType = TensorProxy.TensorType.Integer,
-                data = TensorFloat.AllocZeros(new TensorShape(intShape)),
+                data = new Tensor<float>(new TensorShape(intShape)),
                 shape = shape,
             };
 
@@ -90,7 +90,7 @@ namespace Unity.MLAgents.Tests
             var t = new TensorProxy
             {
                 valueType = TensorProxy.TensorType.FloatingPoint,
-                data = TensorFloat.AllocZeros(new TensorShape(1, 3, 4, 2))
+                data = new Tensor<float>(new TensorShape(1, 3, 4, 2))
             };
 
             TensorUtils.FillTensorWithRandomNormal(t, rn);
@@ -125,7 +125,7 @@ namespace Unity.MLAgents.Tests
 
             for (var i = 0; i < t.data.Length(); i++)
             {
-                Assert.AreEqual(((TensorFloat)t.data)[i], reference[i], 0.0001);
+                Assert.AreEqual(((Tensor<float>)t.data)[i], reference[i], 0.0001);
             }
         }
     }

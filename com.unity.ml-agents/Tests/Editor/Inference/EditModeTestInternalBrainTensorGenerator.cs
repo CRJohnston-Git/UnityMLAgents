@@ -79,7 +79,7 @@ namespace Unity.MLAgents.Tests
             var generator = new BatchSizeGenerator();
             generator.Generate(inputTensor, batchSize, null);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[0], batchSize);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[0], batchSize);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace Unity.MLAgents.Tests
             var generator = new SequenceLengthGenerator();
             generator.Generate(inputTensor, batchSize, null);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[0], 1);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[0], 1);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace Unity.MLAgents.Tests
             var inputTensor = new TensorProxy
             {
                 valueType = TensorProxy.TensorType.FloatingPoint,
-                shape = new long[] { 2, 4 }
+                shape = new int[] { 2, 4 }
             };
             const int batchSize = 4;
             var agentInfos = GetFakeAgents(ObservableAttributeOptions.ExamineAll);
@@ -117,10 +117,10 @@ namespace Unity.MLAgents.Tests
             };
             generator.Generate(inputTensor, batchSize, inputs);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[0, 1], 1);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[0, 3], 3);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[1, 1], 4);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[1, 3], 6);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[0, 1], 1);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[0, 3], 3);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[1, 1], 4);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[1, 3], 6);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Unity.MLAgents.Tests
         {
             var inputTensor = new TensorProxy
             {
-                shape = new long[] { 2, 2 },
+                shape = new int[] { 2, 2 },
                 valueType = TensorProxy.TensorType.Integer
             };
             const int batchSize = 4;
@@ -143,10 +143,10 @@ namespace Unity.MLAgents.Tests
             };
             generator.Generate(inputTensor, batchSize, inputs);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[0, 0], 1);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[0, 1], 2);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[1, 0], 3);
-            Assert.AreEqual(((TensorInt)inputTensor.data)[1, 1], 4);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[0, 0], 1);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[0, 1], 2);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[1, 0], 3);
+            Assert.AreEqual(((Tensor<int>)inputTensor.data)[1, 1], 4);
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace Unity.MLAgents.Tests
         {
             var inputTensor = new TensorProxy
             {
-                shape = new long[] { 2, 5 },
+                shape = new int[] { 2, 5 },
                 valueType = TensorProxy.TensorType.FloatingPoint
             };
             const int batchSize = 4;
@@ -171,10 +171,10 @@ namespace Unity.MLAgents.Tests
 
             generator.Generate(inputTensor, batchSize, inputs);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[0, 0], 1);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[0, 4], 1);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[1, 0], 0);
-            Assert.AreEqual((int)((TensorFloat)inputTensor.data)[1, 4], 1);
+            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[0, 0], 1);
+            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[0, 4], 1);
+            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[1, 0], 0);
+            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[1, 4], 1);
         }
     }
 }

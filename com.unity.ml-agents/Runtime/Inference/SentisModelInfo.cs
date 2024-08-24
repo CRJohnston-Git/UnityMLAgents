@@ -23,7 +23,7 @@ namespace Unity.MLAgents.Inference
         public bool SupportsContinuousAndDiscrete;
         public int ContinuousOutputSize;
         public int DiscreteOutputSize;
-        IWorker m_Worker;
+        Worker m_Worker;
         Model m_Model;
         bool m_DeterministicInference;
         Dictionary<string, Tensor> m_ModelInputTensors;
@@ -39,10 +39,14 @@ namespace Unity.MLAgents.Inference
             m_ModelOutputTensors = new Dictionary<string, Tensor>();
             m_Model = model;
             m_DeterministicInference = deterministicInference;
-            m_Worker = WorkerFactory.CreateWorker(m_Model, DeviceType.CPU);
+            m_Worker = new Worker(m_Model, DeviceType.CPU);
             var inputTensors = GetInputTensors();
             m_ModelInputTensors = PrepareInputs(inputTensors);
-            m_Worker.Execute(m_ModelInputTensors);
+            foreach (var kv in m_ModelInputTensors)
+            {
+                m_Worker.SetInput(kv.Key, kv.Value);
+            }
+            m_Worker.Schedule();
             CacheModelInfo();
         }
 
@@ -94,9 +98,9 @@ namespace Unity.MLAgents.Inference
         /// Gets the Discrete Action Output Shape as a Tensor.
         /// </summary>
         /// <returns></returns>
-        public TensorFloat GetDiscreteActionOutputShape()
+        public Tensor<float> GetDiscreteActionOutputShape()
         {
-            return (TensorFloat)GetTensorByName(TensorNames.DiscreteActionOutputShape);
+            return (Tensor<float>)GetTensorByName(TensorNames.DiscreteActionOutputShape);
         }
 
         void CacheModelInfo()
@@ -108,7 +112,7 @@ namespace Unity.MLAgents.Inference
             OutputNames = GetOutputNames();
             MemorySize = GetMemorySize();
             HasContinuousOutputs = CheckContinuousOutputs();
-            HasContinuousOutputs = CheckDiscreteOutputs();
+            HasDiscreteOutputs = CheckDiscreteOutputs();
             ContinuousOutputName = GetContinuousOutputName();
             DiscreteOutputName = GetDiscreteOutputName();
             SupportsContinuousAndDiscrete = CheckSupportsContinuousAndDiscrete();
@@ -121,7 +125,10 @@ namespace Unity.MLAgents.Inference
             foreach (var output in m_Model.outputs)
             {
                 var outputName = output.name;
-                m_ModelOutputTensors.Add(outputName, m_Worker.TakeOutputOwnership(outputName));
+                Tensor outputTensor = null;
+                m_Worker.CopyOutput(outputName, ref outputTensor);
+                outputTensor.CompleteAllPendingOperations();
+                m_ModelOutputTensors.Add(outputName, outputTensor);
             }
         }
 
@@ -171,7 +178,7 @@ namespace Unity.MLAgents.Inference
             var tensor = GetTensorByName(name);
             var tensorAsInt = 0;
             if (tensor != null)
-                tensorAsInt = (int)((TensorFloat)tensor)[0];
+                tensorAsInt = (int)((Tensor<float>)tensor)[0];
             return tensorAsInt;
         }
 
@@ -230,7 +237,7 @@ namespace Unity.MLAgents.Inference
                 return false;
             if (!CheckSupportsContinuousAndDiscrete())
             {
-                return ((TensorInt)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0;
+                return ((Tensor<int>)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0;
             }
             bool hasStochasticOutput = !m_DeterministicInference &&
                 OutputsContainName(m_Model.outputs, TensorNames.ContinuousActionOutput);
@@ -260,12 +267,12 @@ namespace Unity.MLAgents.Inference
                 return 0;
             if (!CheckSupportsContinuousAndDiscrete())
             {
-                return ((TensorInt)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0 ? ((TensorInt)GetTensorByName(TensorNames.ActionOutputShapeDeprecated))[0] : 0;
+                return ((Tensor<int>)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0 ? ((Tensor<int>)GetTensorByName(TensorNames.ActionOutputShapeDeprecated))[0] : 0;
             }
             else
             {
                 var continuousOutputShape = GetTensorByName(TensorNames.ContinuousActionOutputShape);
-                return continuousOutputShape == null ? 0 : (int)((TensorFloat)continuousOutputShape)[0];
+                return continuousOutputShape == null ? 0 : (int)((Tensor<float>)continuousOutputShape)[0];
             }
         }
 
@@ -286,7 +293,7 @@ namespace Unity.MLAgents.Inference
                 return false;
             if (!CheckSupportsContinuousAndDiscrete())
             {
-                return ((TensorInt)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] == 0;
+                return ((Tensor<int>)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] == 0;
             }
             else
             {
@@ -305,7 +312,7 @@ namespace Unity.MLAgents.Inference
                 return 0;
             if (!CheckSupportsContinuousAndDiscrete())
             {
-                return ((TensorInt)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0 ? 0 : ((TensorInt)GetTensorByName(TensorNames.ActionOutputShapeDeprecated))[0];
+                return ((Tensor<int>)GetTensorByName(TensorNames.IsContinuousControlDeprecated))[0] > 0 ? 0 : ((Tensor<int>)GetTensorByName(TensorNames.ActionOutputShapeDeprecated))[0];
             }
             var discreteOutputShape = GetTensorByName(TensorNames.DiscreteActionOutputShape);
             if (discreteOutputShape == null)
@@ -315,7 +322,7 @@ namespace Unity.MLAgents.Inference
             int result = 0;
             for (int i = 0; i < discreteOutputShape.Length(); i++)
             {
-                result += (int)((TensorFloat)discreteOutputShape)[i];
+                result += (int)((Tensor<float>)discreteOutputShape)[i];
             }
             return result;
         }
