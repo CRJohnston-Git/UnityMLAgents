@@ -171,10 +171,10 @@ namespace Unity.MLAgents.Tests
 
             generator.Generate(inputTensor, batchSize, inputs);
             Assert.IsNotNull(inputTensor.data);
-            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[0, 0], 1);
-            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[0, 4], 1);
-            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[1, 0], 0);
-            Assert.AreEqual((int)((Tensor<int>)inputTensor.data)[1, 4], 1);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[0, 0], 1);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[0, 4], 1);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[1, 0], 0);
+            Assert.AreEqual((int)((Tensor<float>)inputTensor.data)[1, 4], 1);
         }
     }
 }
