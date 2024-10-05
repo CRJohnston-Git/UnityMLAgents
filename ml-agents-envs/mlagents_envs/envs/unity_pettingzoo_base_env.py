@@ -132,7 +132,7 @@ class UnityPettingzooBaseEnv:
                         continue
                 if act_spec.continuous_size > 0:
                     c_space = spaces.Box(
-                        -1, 1, (act_spec.continuous_size,), dtype=np.int32
+                        -np.float32(np.inf), np.float32(np.inf), (act_spec.continuous_size,), dtype=np.float32
                     )
                     if self._seed is not None:
                         c_space.seed(self._seed)
@@ -168,7 +168,7 @@ class UnityPettingzooBaseEnv:
             if action.continuous is not None:
                 self._current_action[current_behavior].continuous[
                     current_index
-                ] = action.continuous[0]
+                ] = action.continuous
             if action.discrete is not None:
                 self._current_action[current_behavior].discrete[
                     current_index
