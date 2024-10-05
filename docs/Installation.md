@@ -37,28 +37,14 @@ Consequently, to install and use the ML-Agents Toolkit you will need to:
 - Install the `mlagents-envs`
 - Install the `mlagents` Python package
 
+
+### Install **Unity and get packages**
+
 ### Install **Unity 2023.2** or Later
 
 [Download](https://unity3d.com/get-unity/download) and install Unity. We
 strongly recommend that you install Unity through the Unity Hub as it will
 enable you to manage multiple Unity versions.
-
-### Install **Python 3.10.12**
-
-We recommend [installing](https://www.python.org/downloads/) Python 3.10.12.
-If you are using Windows, please install the x86-64 version and not x86.
-If your Python environment doesn't include `pip3`, see these
-[instructions](https://packaging.python.org/guides/installing-using-linux-tools/#installing-pip-setuptools-wheel-with-linux-package-managers)
-on installing it. We also recommend using [conda](https://docs.conda.io/en/latest/) or [mamba](https://github.com/mamba-org/mamba) to manage your python virtual environments.
-
-#### Conda python setup
-
-Once conda has been installed in your system, open a terminal and execute the following commands to setup a python 3.10.12 virtual environment
-and activate it.
-
-```shell
-conda create -n mlagents python=3.10.12 && conda activate mlagents
-```
 
 ### Clone the ML-Agents Toolkit Repository (Recommended)
 
@@ -140,6 +126,27 @@ outlined in the previous
 [Advanced: Local Installation for Development](#advanced-local-installation-for-development-1)
 section. Complete installation steps can be found in the
 [package documentation](../com.unity.ml-agents.extensions/Documentation~/com.unity.ml-agents.extensions.md#installation).
+
+
+### Install **Python and get packages**
+
+### Install **Python 3.10.12**
+
+We recommend [installing](https://www.python.org/downloads/) Python 3.10.12.
+If you are using Windows, please install the x86-64 version and not x86.
+If your Python environment doesn't include `pip3`, see these
+[instructions](https://packaging.python.org/guides/installing-using-linux-tools/#installing-pip-setuptools-wheel-with-linux-package-managers)
+on installing it. We also recommend using [conda](https://docs.conda.io/en/latest/) or [mamba](https://github.com/mamba-org/mamba) to manage your python virtual environments.
+
+#### Conda python setup
+
+Once conda has been installed in your system, open a terminal and execute the following commands to setup a python 3.10.12 virtual environment
+and activate it.
+
+```shell
+conda create -n mlagents python=3.10.12 && conda activate mlagents
+```
+
 
 ### Install the `mlagents` Python package
 
